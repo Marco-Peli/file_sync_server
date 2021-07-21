@@ -1,0 +1,22 @@
+{
+  "name": "file_sync_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Marco-Peli/file_sync_server.git"
+  },
+  "author": "Marco Peli",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Marco-Peli/file_sync_server/issues"
+  },
+  "homepage": "https://github.com/Marco-Peli/file_sync_server#readme",
+  "dependencies": {
+    "nodemon": "^2.0.12"
+  }
+}
