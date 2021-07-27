@@ -1,17 +1,20 @@
-const net = require('net');
+const express = require('express');
+const app = express();
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
 const util = require('util');
-const server = net.createServer();
-const port = 3005;
-const timeout = 20000;
+const port = 3005
 
 let subscribedClients = []
 
-server.on('connection', async function(socket) {
+io.on('connection', async function(socket) {
   console.log("client connected");
-  console.log("remote client ip: " + socket.remoteAddress)
   await addClient(socket);
-  socket.on('data', async function(data) {
-    console.log("received data " + data)
+  socket.on('action', async function(data) {
+    console.log("received sync requests, forwarding to connected clients...")
+    console.log("data: " + data) 
     await syncClients(socket, data);
   });
 
@@ -31,22 +34,13 @@ server.on('connection', async function(socket) {
     removeClient(socket);
   });
 
-  socket.setTimeout(parseInt(timeout), function() {
+  socket.on('disconnect', function(error) {
     removeClient(socket);
-    socket.destroy();
-    console.log('Socket forced timed out for maximum on-time elapsed');
-  });
-
-
-  socket.on('close', function(error) {
-    removeClient(socket);
-    console.log('Socket closed!');
+    console.log('Socket closed by remote host!');
     if (error) {
-      console.log('Socket was closed for transmission error!');
     }
   });
 });
-
 
 async function removeClient(socket)
 {
@@ -74,7 +68,7 @@ async function syncClients(socket, data)
   subscribedClients.forEach((client) => {
     if(!util.isDeepStrictEqual(client, socket))
     {
-      client.write(data);
+      client.emit('action', data);
     }
   })
 }
